@@ -1,8 +1,10 @@
 const express = require("express");
+const bcrypt = require('bcryptjs');
+
 const router = express.Router();
 const User = require("../models/user");
 
-// get all
+// ---------- get all ----------
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
@@ -12,7 +14,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// get one
+// ---------- get one ----------
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -23,15 +25,16 @@ router.get("/:id", async (req, res) => {
   } catch (error) {}
 });
 
-// create one
+// ---------- create one ----------
 router.post("/", async (req, res) => {
-  console.log(req.body);
-  const user = new User({
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-  });
   try {
+    console.log(req.body);
+    const hashPassword = await bcrypt.hash(req.body.password, 10);
+    const user = new User({
+      username: req.body.username,
+      email: req.body.email,
+      password: hashPassword,
+    });
     const newUser = await user.save();
     res.status(201).json(newUser);
   } catch (error) {
@@ -39,10 +42,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-// update one
+// ---------- update one ----------
 router.patch("/:id", (req, res) => {});
 
-// delete one
+// ---------- delete one ----------
 router.delete("/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
   res.json({ message: "user deleted" });
