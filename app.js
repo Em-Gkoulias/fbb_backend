@@ -8,7 +8,7 @@ const cors = require("cors");
 const passport = require("passport");
 // const flash = require("express-flash");
 const session = require("express-session");
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 require("dotenv").config();
 const usersRouter = require("./routes/users");
@@ -27,13 +27,14 @@ db.once("open", () => console.log("Conected to database"));
 
 // ---------- middlewares ----------
 const app = express();
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000", // <-- location of the react app were connecting to
     credentials: true,
   })
 );
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 app.use("/users", usersRouter);
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin: *");
@@ -49,10 +50,9 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
   })
 );
-app.use(cookieParser("secretcode"));
 app.use(passport.initialize());
 app.use(passport.session());
 require("./passport-config")(passport);
