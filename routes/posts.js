@@ -27,7 +27,7 @@ router.post("/", upload.single('file'), async (req, res) => {
     const post = new Post({
       title: req.body.title,
       meme: newFileName,
-      user: req.body.user,
+      user_id: req.body.user_id,
     });
     fs.rename(`./uploads/${req.file.filename}`, `./uploads/${newFileName}`, () => {
       console.log('callback')
