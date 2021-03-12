@@ -23,11 +23,12 @@ router.post("/", upload.single('file'), async (req, res) => {
   try {
     const fileType = req.file.mimetype.split("/")[1];
     const newFileName = req.file.filename + "." + fileType;
-    
+  
     const post = new Post({
       title: req.body.title,
       meme: newFileName,
       user_id: req.body.user_id,
+      username: req.body.username
     });
     fs.rename(`./uploads/${req.file.filename}`, `./uploads/${newFileName}`, () => {
       console.log('callback')
@@ -39,5 +40,17 @@ router.post("/", upload.single('file'), async (req, res) => {
     res.status(500).json({ message: error });
   }
 });
+
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      res.status(404).json({ message: "post missing" });
+    }
+    res.send(post);    
+  } catch (error) {
+    console.log(error);
+  }
+})
 
 module.exports = router;

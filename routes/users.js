@@ -22,7 +22,9 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ message: "user missing" });
     }
     res.send(user);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 });
 
 // ---------- create one ----------
