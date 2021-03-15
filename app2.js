@@ -13,6 +13,7 @@ const app = express();
 const path = 3001;
 const usersRouter = require("./routes/users");
 const postsRouter = require("./routes/posts");
+const commentsRouter = require("./routes/comments");
 const User = require('./models/user');
 
 mongoose.connect(process.env.DATABASE_URL, {
@@ -54,6 +55,7 @@ require("./passport-config")(passport);
 app.use("/static", express.static("./uploads"));
 app.use("/users", usersRouter);
 app.use("/posts", postsRouter);
+app.use("/comments", commentsRouter);
 
 app.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
