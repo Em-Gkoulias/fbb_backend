@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 const Comment = require('../models/comment');
+const Post = require("../models/post");
+const User = require('../models/user');
 
 router.get('/', async (req, res) => {
   try {
@@ -14,15 +16,25 @@ router.get('/', async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    const post = await Post.findById(req.body.post_id);
+    const user = await User.findById(req.body.user_id);
+
     const comment = new Comment({
-      user_id: req.body.user_id,
-      post_id: req.body.post_id,
       body: req.body.body,
-      username: req.body.username
-    })
+      post,
+      user, 
+    });
 
     const newComment = await comment.save();
-    res.status(201).json(newComment);
+
+    // console.log(req.body.post_id);
+    const relPost = await Post.findById(req.body.post_id);
+    console.log(relPost);
+    relPost["comments"].push(newComment);
+    await relPost.save();
+
+    const finalComment = await Comment.findById(newComment._id).populate('post user');
+    res.status(201).json(finalComment);
   } catch (error) {
     console.log(error);
   }
