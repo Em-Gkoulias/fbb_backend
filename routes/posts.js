@@ -21,7 +21,6 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", upload.single('file'), async (req, res) => {
-  // console.log(req.body.user_id);
   try {
     const fileType = req.file.mimetype.split("/")[1];
     const newFileName = req.file.filename + "." + fileType;
@@ -36,8 +35,10 @@ router.post("/", upload.single('file'), async (req, res) => {
       console.log('callback')
     })
 
+    user["posts"].push(post);
     const newPost = await post.save();
-    const finalPost = await Post.findById(newPost._id).populate('user');
+    await user.save();
+    const finalPost = await Post.findById(newPost._id).populate('user comment');
     res.status(201).json(finalPost);
   } catch (error) {
     res.status(500).json({ message: error });
