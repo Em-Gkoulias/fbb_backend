@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 
+// const User = require('./user').schema;
+
 const commentSchema = new mongoose.Schema({
   body: {
     type: String,
-    // required: true,
+    required: true,
   },
   post: {
     type: mongoose.Schema.Types.ObjectId,
@@ -11,9 +13,8 @@ const commentSchema = new mongoose.Schema({
     // required: true,
   },
   user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    // required: true,
+    type: mongoose.Types.ObjectId,
+    ref: 'User'
   },
 });
 

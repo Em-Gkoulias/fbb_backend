@@ -39,6 +39,7 @@ router.post("/", upload.single('file'), async (req, res) => {
     const newPost = await post.save();
     await user.save();
     const finalPost = await Post.findById(newPost._id).populate('user comment');
+    console.log(finalPost);
     res.status(201).json(finalPost);
   } catch (error) {
     res.status(500).json({ message: error });
@@ -56,5 +57,18 @@ router.get("/:id", async (req, res) => {
     console.log(error);
   }
 })
+
+router.get("/:id/comments", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      res.status(404).json({ message: "post missing" });
+    }
+    console.log(post.comments);
+    res.send(post.comments);
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 module.exports = router;

@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Post = require('./post').schema;
+const Comment = require('./comment').schema;
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -13,18 +15,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  posts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
-    },
-  ],
-  comments: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment"
-    }
-  ]
+  posts: [Post],
+  comments: [Comment]
 });
 
 module.exports = mongoose.model("User", userSchema);
