@@ -1,16 +1,13 @@
 const express = require("express");
 const multer = require('multer');
-const path = require('path');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs')
 
 const router = express.Router();
 const Post = require("../models/post");
 const User = require('../models/user');
-const Comment = require('../models/comment');
 
-// const imgPath = require('../images/index.png');
-
+// ---------- get all posts ----------
 router.get("/", async (req, res) => {
   try {
     const posts = await Post.find();
@@ -20,6 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ---------- create a post ----------
 router.post("/", upload.single('file'), async (req, res) => {
   try {
     const fileType = req.file.mimetype.split("/")[1];
@@ -36,16 +34,16 @@ router.post("/", upload.single('file'), async (req, res) => {
     })
 
     user["posts"].push(post);
-    const newPost = await post.save();
+    const savedPost = await post.save();
     await user.save();
-    const finalPost = await Post.findById(newPost._id).populate('user comment');
-    console.log(finalPost);
-    res.status(201).json(finalPost);
+    const newPost = await Post.findById(savedPost._id).populate('user comment');
+    res.status(201).json(newPost);
   } catch (error) {
     res.status(500).json({ message: error });
   }
 });
 
+// ---------- show a post ----------
 router.get("/:id", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -58,13 +56,13 @@ router.get("/:id", async (req, res) => {
   }
 })
 
+// ---------- get all comments of a post ----------
 router.get("/:id/comments", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) {
       res.status(404).json({ message: "post missing" });
     }
-    console.log(post.comments);
     res.send(post.comments);
   } catch (error) {
     console.log(error);

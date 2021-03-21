@@ -5,6 +5,7 @@ const Comment = require('../models/comment');
 const Post = require("../models/post");
 const User = require('../models/user');
 
+// ---------- get all comments ----------
 router.get('/', async (req, res) => {
   try {
     const comments = await Comment.find();
@@ -14,6 +15,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ---------- create a comment ----------
 router.post("/", async (req, res) => {
   try {
     const post = await Post.findById(req.body.post_id);
@@ -25,39 +27,18 @@ router.post("/", async (req, res) => {
       user, 
     });
 
-    const newComment = await comment.save();
-
-    // console.log(req.body.post_id);
-    // const relPost = await Post.findById(req.body.post_id);
-    // const relUser = await User.findById(req.body.user_id).populate();
+    const savedComment = await comment.save();
     
-    post["comments"].push(newComment);
-    user["comments"].push(newComment);
+    post["comments"].push(savedComment);
+    user["comments"].push(savedComment);
     await post.save();
     await user.save();
 
-    const finalComment = await Comment.findById(newComment._id).populate('user', 'username');
+    const finalComment = await Comment.findById(savedComment._id).populate('user', 'username');
     res.status(201).json(finalComment);
   } catch (error) {
     console.log(error);
   }
 });
-
-// router.get('/:id', async (req, res) => {
-//   try {
-//     const post = await Post.findById(req.params.id);
-//     // console.log(post)
-//     const comments = post.comments.map((commentId) => {
-//       let comment = await Comment.findById(commentId);
-//       return comment;
-//     })
-
-
-//     // const comments = await Comment.find({ post_id: req.params.id })
-//     res.send(comments)
-//   } catch (error) {
-//     console.log(error)
-//   }
-// });
 
 module.exports = router;
