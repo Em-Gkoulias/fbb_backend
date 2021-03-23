@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const Comment = require('./comment').schema;
-const User = require('./user').schema;
+const Comment = require("./comment").schema;
 
 const postSchema = new mongoose.Schema({
   title: {
@@ -14,6 +13,7 @@ const postSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
   comments: [Comment],
 });

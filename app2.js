@@ -3,10 +3,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-// const MongoStore = require("connect-mongo").default;
 const passport = require("passport");
-const passportLocal = require("passport-local").Strategy;
-const bcrypt = require("bcryptjs");
+// const passportLocal = require("passport-local").Strategy;
+// const bcrypt = require("bcryptjs");
 
 require("dotenv").config();
 const app = express();
@@ -14,7 +13,6 @@ const path = 3001;
 const usersRouter = require("./routes/users");
 const postsRouter = require("./routes/posts");
 const commentsRouter = require("./routes/comments");
-const User = require('./models/user');
 
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
@@ -46,12 +44,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 require("./passport-config")(passport);
 
-// app.use((req, res, next) => {
-//   console.log(req.session);
-//   console.log(req.user);
-//   next();
-// });
-
 app.use("/static", express.static("./uploads"));
 app.use("/users", usersRouter);
 app.use("/posts", postsRouter);
@@ -65,7 +57,6 @@ app.post("/login", (req, res, next) => {
       req.logIn(user, (err) => {
         if (err) throw err;
         res.send("Successfully Authenticated");
-        // console.log(req.user);
       });
     }
   })(req, res, next);
@@ -79,11 +70,6 @@ app.post("/logout", (req, res, next) => {
 app.get("/user", (req, res) => {
   res.send(req.user);
 });
-
-app.post("/findUser", async (req, res) => {
-  // const user = User.find()
-  console.log(req.body);
-})
 
 app.listen(path, () => {
   console.log(`listening on ${path}`);
