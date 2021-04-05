@@ -15,6 +15,22 @@ const commentSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  // timestamp: {
+  //   type: Date,
+  //   required: true,
+  // },
+  // upvotes: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: "User",
+  //   },
+  // ],
+  // downvotes: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: "User",
+  //   },
+  // ],
 });
 
 module.exports = mongoose.model("Comment", commentSchema);

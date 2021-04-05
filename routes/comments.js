@@ -9,7 +9,7 @@ const User = require('../models/user');
 router.get('/', async (req, res) => {
   try {
     const comments = await Comment.find();
-    res.send(comments);
+    res.status(200).send(comments);
   } catch (error) {
     console.log(error);
   }
