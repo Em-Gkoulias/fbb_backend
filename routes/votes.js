@@ -14,6 +14,15 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ---------- get a vote ----------
+router.get('/:id', async (req, res) => {
+  try {
+    const vote = await Vote.findById(req.params.id);
+    res.status(200).send(vote);
+  } catch (error) {
+    console.log(error);
+  }
+})
 
 // ---------- create a new vote ----------
 router.post('/', async (req, res) => {
@@ -43,7 +52,8 @@ router.post('/', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const vote = await Vote.findById(req.params.id);
-    vote.upvote = !vote.upvote;
+    vote.upvote = req.body.upvoted;
+    vote.downvote = req.body.downvoted;
     const editedVote = await vote.save();
 
     const post = await Post.findById(vote.post);
@@ -57,10 +67,11 @@ router.patch('/:id', async (req, res) => {
       }
     }
 
-    post.votes[relatedVoteIndex].upvote = !post.votes[relatedVoteIndex].upvote; 
+    post.votes[relatedVoteIndex].upvote = req.params.upvoted; 
+    post.votes[relatedVoteIndex].downvote = req.params.downvoted;
     await post.save();
 
-    res.send(editedVote);
+    res.status(200).send(editedVote);
   } catch (error) {
     console.log(error);
   }
@@ -72,11 +83,10 @@ router.delete('/:voteId/:postId', async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
     const vote = await Vote.findById(req.params.voteId);
-    console.log(vote);
     const index = post["votes"].indexOf(vote);
     post["votes"].splice(index, 1);
-    post.save();
-    vote.delete();
+    await post.save();
+    await vote.delete();
     res.status(200).send({message: 'vote deleted'})
   } catch (error) {
     console.log(error);
