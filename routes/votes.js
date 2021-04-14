@@ -52,8 +52,8 @@ router.post('/', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const vote = await Vote.findById(req.params.id);
-    vote.upvote = req.body.upvoted;
-    vote.downvote = req.body.downvoted;
+    vote.upvote = req.body.upvote;
+    vote.downvote = req.body.downvote;
     const editedVote = await vote.save();
 
     const post = await Post.findById(vote.post);
@@ -67,11 +67,15 @@ router.patch('/:id', async (req, res) => {
       }
     }
 
-    post.votes[relatedVoteIndex].upvote = req.params.upvoted; 
-    post.votes[relatedVoteIndex].downvote = req.params.downvoted;
-    await post.save();
+    const finalVote = await Vote.findById(editedVote._id).populate('post');
 
-    res.status(200).send(editedVote);
+    post.votes[relatedVoteIndex].upvote = req.body.upvote; 
+    post.votes[relatedVoteIndex].downvote = req.body.downvote;
+
+    await post.save();
+    // const finalPost = await Post.findById(post._id).
+
+    res.status(200).send(post.votes[0]);
   } catch (error) {
     console.log(error);
   }
