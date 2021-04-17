@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Post = require("./post").schema;
 const Comment = require("./comment").schema;
+const Vote = require("./vote").schema;
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema({
   },
   posts: [Post],
   comments: [Comment],
-  // uniqueString: 
+  votes: [Vote],
   confirmed: {
     type: Boolean,
     default: false,

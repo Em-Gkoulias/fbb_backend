@@ -28,6 +28,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const post = await Post.findById(req.body.post);
+    const user = await User.findById(req.body.user);
 
     const vote = new Vote({
       post: req.body.post,
@@ -38,10 +39,13 @@ router.post('/', async (req, res) => {
 
     const savedVote = await vote.save();
 
+    user["votes"].push(savedVote);
+    await user.save();
+
     post["votes"].push(savedVote);
     await post.save();
 
-    const finalVote = await Vote.findById(savedVote._id).populate('post')
+    const finalVote = await Vote.findById(savedVote._id).populate('post', 'user');
     console.log(finalVote)
     res.status(201).send(finalVote); 
   } catch (error) {
@@ -56,8 +60,10 @@ router.patch('/:id', async (req, res) => {
     vote.downvote = req.body.downvote;
     const editedVote = await vote.save();
 
+    const user = await User.findById(vote.user);
     const post = await Post.findById(vote.post);
     let totalVotes = post.votes.length;
+    let userVotes = user.votes.length;
     
     let relatedVoteIndex;
     for (let i = 0; i < totalVotes; i++) {
@@ -67,11 +73,21 @@ router.patch('/:id', async (req, res) => {
       }
     }
 
-    const finalVote = await Vote.findById(editedVote._id).populate('post');
+    for (let i = 0; i < userVotes; i++) {
+      if (user.votes[i]._id == req.params.id) {
+        userVoteIndex = i;
+        break;
+      }
+    }
+
+    const finalVote = await Vote.findById(editedVote._id).populate('post', 'user');
 
     post.votes[relatedVoteIndex].upvote = req.body.upvote; 
     post.votes[relatedVoteIndex].downvote = req.body.downvote;
+    user.votes[userVoteIndex].upvote = req.body.upvote;
+    user.votes[userVoteIndex].downvote = req.body.downvote;
 
+    await user.save();
     await post.save();
     // const finalPost = await Post.findById(post._id).
 
@@ -85,8 +101,16 @@ router.patch('/:id', async (req, res) => {
 // ---------- delete a vote ----------
 router.delete('/:voteId/:postId', async (req, res) => {
   try {
+    // const user = await User.findById(req.params.userId);
     const post = await Post.findById(req.params.postId);
     const vote = await Vote.findById(req.params.voteId);
+    const user = await User.findById(req.user.id);
+    console.log(user);
+
+    const userIndex = user["votes"].indexOf(vote);
+    user["votes"].splice(userIndex, 1);
+    await user.save();
+
     const index = post["votes"].indexOf(vote);
     post["votes"].splice(index, 1);
     await post.save();
